@@ -1,6 +1,5 @@
 package ugly.code.blog.post;
 
-
 public class Comment {
 
     private User author;

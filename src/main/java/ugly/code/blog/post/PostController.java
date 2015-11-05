@@ -14,6 +14,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.util.EntityUtils;
 
 /**
+ * Blogs are created
  *
  * @author thiagoampj
  *
@@ -27,6 +28,7 @@ public class PostController {
     HttpClient httpClient;
 
     public BlogPost createPost(final String message) throws ParseException, IOException {
+
         // Instantiate
         if (request.getSession() == null) {
             throw new IllegalStateException("There is no session ! ");
@@ -35,7 +37,7 @@ public class PostController {
         post.setPost(message);
         post.setAuthor((User) request.getSession().getAttribute("user"));
         //Using Http Client
-        final HttpPost httpPost = new HttpPost("http://localhost:9009/db/data");
+        final HttpPost httpPost = new HttpPost("http://localhost:9009/posts");
         //Sending post
         final HttpResponse response = httpClient.execute(httpPost);
         //Should be 200

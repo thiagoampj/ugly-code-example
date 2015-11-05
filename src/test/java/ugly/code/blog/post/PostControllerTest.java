@@ -65,4 +65,15 @@ public class PostControllerTest {
         final BlogPost post = controller.createPost("What a nice day!");
         assertTrue(post.getId().equals(4L));
     }
+
+    @Test
+    public void test_PostControlloer_createPost2() throws ParseException, IOException {
+        when(request.getSession()).thenReturn(session);
+        when(client.execute(Mockito.any(HttpPost.class))).thenReturn(response);
+        when(response.getEntity()).thenReturn(entity);
+        when(response.getStatusLine()).thenReturn(new BasicStatusLine(HttpVersion.HTTP_1_1, 200, null));
+        when(entity.getContent()).thenReturn(new ByteArrayInputStream("G".getBytes()));
+        final BlogPost post = controller.createPost("What a nice day 2!");
+        assertTrue(post.getId().equals(4L));
+    }
 }
