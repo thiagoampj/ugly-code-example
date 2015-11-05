@@ -11,22 +11,16 @@
  *----------------------------------------------------------------------------*/
 package ugly.code.blog.post;
 
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.mockito.Mockito.when;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpVersion;
 import org.apache.http.ParseException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.message.BasicStatusLine;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -43,37 +37,32 @@ public class PostControllerTest {
     @Mock
     HttpSession session;
 
-    @Mock
-    HttpClient client;
-
-    @Mock
-    HttpResponse response;
-
     @InjectMocks
     PostController controller;
 
     @Mock
-    HttpEntity entity;
+    PostService service;
+
+    @Mock
+    BlogPost post;
 
     @Test()
-    public void test_PostController_createPost() throws ParseException, IOException {
+    public void shouldCreateBlogPostNicely() throws ParseException, IOException {
         when(request.getSession()).thenReturn(session);
-        when(client.execute(Mockito.any(HttpPost.class))).thenReturn(response);
-        when(response.getEntity()).thenReturn(entity);
-        when(response.getStatusLine()).thenReturn(new BasicStatusLine(HttpVersion.HTTP_1_1, 200, null));
-        when(entity.getContent()).thenReturn(new ByteArrayInputStream("4".getBytes()));
         final BlogPost post = controller.createPost("What a nice day!");
-        assertTrue(post.getId().equals(4L));
+        when(service.createPost(Mockito.any(BlogPost.class))).thenReturn(post);
+        Assert.assertThat(post, notNullValue());
+        Mockito.verify(service).createPost(post);
     }
 
-    @Test
-    public void test_PostControlloer_createPost2() throws ParseException, IOException {
-        when(request.getSession()).thenReturn(session);
-        when(client.execute(Mockito.any(HttpPost.class))).thenReturn(response);
-        when(response.getEntity()).thenReturn(entity);
-        when(response.getStatusLine()).thenReturn(new BasicStatusLine(HttpVersion.HTTP_1_1, 200, null));
-        when(entity.getContent()).thenReturn(new ByteArrayInputStream("G".getBytes()));
-        final BlogPost post = controller.createPost("What a nice day 2!");
-        assertTrue(post.getId().equals(4L));
+    @Test(expected = IllegalStateException.class)
+    public void shouldNotCreatePostWhenUserIsNotLogged() throws ParseException, IOException {
+        when(request.getSession()).thenReturn(null);
+        try {
+            final BlogPost post = controller.createPost("What a nice day!");
+        } finally {
+            Mockito.verifyZeroInteractions(service);
+        }
+
     }
 }
